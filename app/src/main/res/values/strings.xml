@@ -3,8 +3,12 @@
     <string name="quantity_header_text">Quantity</string>
     <string name="quantity_text">2</string>
     <string name="order_button_text">Order</string>
-    <string name="price_header_text">Price</string>
-    <string name="price_text">$10</string>
+    <string name="order_summary_header_text">Order Summary</string>
+    <string name="summary_text">Name: \nAdd whipped cream?: \nAdd chocolate?: \nQuantity: \nTotal: </string>
     <string name="plus">+</string>
     <string name="minus">-</string>
+    <string name="toppings_header_text">Toppings</string>
+    <string name="topping_one_text">Whipped Cream</string>
+    <string name="topping_two_text">Chocolate</string>
+    <string name="name_hint_text">Name</string>
 </resources>
