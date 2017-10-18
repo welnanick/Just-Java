@@ -1,11 +1,14 @@
 package com.example.android.justjava;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -16,7 +19,6 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private int quantity = 2;
-    private int pricePerCup = 5;
     private boolean hasWhippedCream = false;
     private boolean hasChocolate = false;
 
@@ -30,15 +32,31 @@ public class MainActivity extends AppCompatActivity {
 
     public void increment(View view) {
 
-        quantity++;
-        displayQuantity(quantity);
+        if (quantity < 100) {
+
+            quantity++;
+            displayQuantity(quantity);
+
+        } else {
+
+            Toast.makeText(this, "You cannot have more than 100 cups of coffee", Toast.LENGTH_SHORT).show();
+
+        }
 
     }
 
     public void decrement(View view) {
 
-        quantity--;
-        displayQuantity(quantity);
+        if (quantity > 1) {
+
+            quantity--;
+            displayQuantity(quantity);
+
+        } else {
+
+            Toast.makeText(this, "You cannot have less than 1 cup of coffee", Toast.LENGTH_SHORT).show();
+
+        }
 
     }
 
@@ -52,12 +70,13 @@ public class MainActivity extends AppCompatActivity {
      * @return The summary of the order
      */
     public String createOrderSummary(int orderPrice, boolean hasWhippedCream, boolean hasChocolate, String name) {
-        String orderSummary = "Name: " + name + "\n";
-        orderSummary += "Add whipped cream?: " + hasWhippedCream + "\n";
-        orderSummary += "Add chocolate?: " + hasChocolate + "\n";
-        orderSummary += "Quantity: " + quantity + "\n";
-        orderSummary += "Total: " + NumberFormat.getCurrencyInstance().format(orderPrice) + "\n";
-        orderSummary += "Thank You!";
+
+        String orderSummary = String.format(getString(R.string.order_summary_name), name) + "\n";
+        orderSummary += String.format(getString(R.string.order_summary_whipped_cream), hasWhippedCream) + "\n";
+        orderSummary += String.format(getString(R.string.order_summary_chocolate), hasChocolate) + "\n";
+        orderSummary += String.format(getString(R.string.order_summary_quantity), quantity) + "\n";
+        orderSummary += String.format(getString(R.string.order_summary_price), NumberFormat.getCurrencyInstance().format(orderPrice)) + "\n";
+        orderSummary += getString(R.string.thank_you);
         return orderSummary;
 
 
@@ -71,7 +90,13 @@ public class MainActivity extends AppCompatActivity {
         EditText nameEditText = findViewById(R.id.name_edit_text);
         String name = nameEditText.getText().toString();
 
-        displaySummary(createOrderSummary(calculatePrice(), hasWhippedCream, hasChocolate, name));
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.order_summary_email_subject), name));
+        intent.putExtra(Intent.EXTRA_TEXT, createOrderSummary(calculatePrice(), hasWhippedCream, hasChocolate, name));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
 
     }
 
@@ -79,6 +104,20 @@ public class MainActivity extends AppCompatActivity {
      * Calculates the price of the order.
      */
     private int calculatePrice() {
+
+        int pricePerCup = 5;
+
+        if (hasChocolate) {
+
+            pricePerCup += 2;
+
+        }
+
+        if (hasWhippedCream) {
+
+            pricePerCup += 1;
+
+        }
 
         return quantity * pricePerCup;
 
@@ -91,17 +130,6 @@ public class MainActivity extends AppCompatActivity {
 
         TextView quantityTextView = findViewById(R.id.quantity_text_view);
         quantityTextView.setText(String.format(Locale.US, "%d", numberOfCups));
-
-    }
-
-
-    /**
-     * This method displays the given price on the screen.
-     */
-    private void displaySummary(String summary) {
-
-        TextView orderSummaryTextView = findViewById(R.id.order_summary_text_view);
-        orderSummaryTextView.setText(summary);
 
     }
 
